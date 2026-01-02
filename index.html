@@ -11,6 +11,9 @@
 	<meta name="description" content="Free HTML5 Template by FREEHTML5.CO" />
 	<meta name="keywords" content="free html5, free template, free bootstrap, html5, css3, mobile first, responsive" />
 	<meta name="author" content="FREEHTML5.CO" />
+	
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="images/website-icon.png">
 
   <!-- 
 	//////////////////////////////////////////////////////
@@ -56,6 +59,83 @@
 
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Leaflet CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+	<!-- Game Modal CSS -->
+	<style>
+		.game-modal {
+			display: none;
+			position: fixed;
+			z-index: 9999;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.95);
+			overflow: auto;
+		}
+		.game-modal.active {
+			display: block;
+		}
+		.game-modal-content {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			padding: 20px;
+			box-sizing: border-box;
+		}
+		.game-close {
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			color: #fff;
+			font-size: 40px;
+			font-weight: bold;
+			cursor: pointer;
+			z-index: 10000;
+			transition: color 0.3s;
+		}
+		.game-close:hover {
+			color: #F14E95;
+		}
+		#game-play-modal .row {
+			display: flex;
+			height: calc(100vh - 40px);
+			margin: 0;
+			flex-wrap: nowrap;
+		}
+		#game-play-modal #map {
+			height: calc(100vh - 100px);
+			border-radius: 5px;
+			border: 2px solid #ddd;
+		}
+		#game-play-modal .col-md-4 {
+			background: white;
+			padding: 20px;
+			border-radius: 5px;
+			margin-right: 15px;
+			height: calc(100vh - 40px);
+			overflow-y: auto;
+			flex: 0 0 33.333333%;
+			max-width: 33.333333%;
+		}
+		#game-play-modal .col-md-8 {
+			padding-left: 0;
+			flex: 0 0 66.666667%;
+			max-width: 66.666667%;
+		}
+		#game-end-modal {
+			background: white;
+			padding: 40px;
+			border-radius: 10px;
+			max-width: 700px;
+			margin: 5vh auto;
+			max-height: 90vh;
+			overflow-y: auto;
+		}
+	</style>
 
 	<!-- Modernizr JS -->
 	<script src="js/modernizr-2.6.2.min.js"></script>
@@ -359,6 +439,107 @@
 		</div>
 	</div>
 
+	<div id="fh5co-geogame" class="fh5co-section-gray" style="padding-bottom: 60px;">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2 text-center fh5co-heading animate-box">
+					<span>Speel een spelletje!</span>
+					<h2>Raad de Locatie</h2>
+					<p>Kun jij raden waar deze plekken zijn? Klik op de kaart!</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div id="game-container" class="text-center">
+						<h3>Raad de Locatie</h3>
+						<p>Kun jij raden waar deze plekken zijn? Klik op de kaart!</p>
+						<button class="btn btn-primary btn-lg" id="start-game-btn" style="margin-top: 20px;">Start Spel</button>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+						<h3 class="text-center" style="margin-bottom: 20px;">🏆 Top 10</h3>
+						<div id="main-leaderboard-list">
+							<p style="text-align: center; color: #999;">Laden...</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Game Modal -->
+	<div id="game-modal" class="game-modal">
+		<span class="game-close" id="close-game-modal">&times;</span>
+		<div class="game-modal-content">
+			<!-- Game Play Screen -->
+			<div id="game-play-modal" style="display: none;">
+				<div class="row">
+					<div class="col-md-4">
+						<div class="text-center" style="margin-bottom: 20px;">
+						<h4 style="color: #333; margin: 0;">Ronde <span id="current-round">1</span> van 5</h4>
+						<p id="question-text" style="color: #666; margin-top: 10px;">Waar is deze foto genomen?</p>
+						</div>
+						<div style="background: #f0f0f0; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+							<img id="question-image" src="" alt="Raad de locatie" style="width: 100%; height: auto; border-radius: 5px;">
+						</div>
+						<div id="feedback" style="margin-top: 15px; text-align: center; font-weight: bold; min-height: 60px;"></div>
+						<div class="text-center" style="margin-top: 15px;">
+							<button id="next-button" class="btn btn-primary" style="display: none;">Volgende Ronde</button>
+						</div>
+					</div>
+					<div class="col-md-8">
+						<div id="map"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Game End Screen -->
+			<div id="game-end-modal" style="display: none;">
+				<div class="text-center">
+					<h3>Spel Afgelopen!</h3>
+					<div style="margin: 30px 0;">
+						<div style="font-size: 60px; color: #F14E95;">
+							<span id="final-score">0</span> punten
+						</div>
+						<p style="font-size: 20px; margin-top: 10px;" id="score-message">Geweldig gedaan!</p>
+					</div>
+					
+					<!-- Save to Leaderboard -->
+					<div id="save-score-section" style="margin: 30px auto; max-width: 400px;">
+						<h4>Zet je naam op de leaderboard!</h4>
+						<div style="margin: 15px 0;">
+							<input type="text" id="player-name" class="form-control" placeholder="Je naam" maxlength="30" style="text-align: center; font-size: 18px;">
+						</div>
+						<button class="btn btn-success btn-lg" id="save-score-btn">💾 Opslaan op Leaderboard</button>
+						<div id="save-feedback" style="margin-top: 10px; font-weight: bold;"></div>
+					</div>
+
+					<div id="round-details" style="text-align: left; max-width: 500px; margin: 0 auto 30px;">
+						<!-- Round details will be inserted here -->
+					</div>
+
+					<!-- Leaderboard Display -->
+					<div id="leaderboard-section" style="margin: 30px auto; max-width: 500px;">
+						<h4 style="margin-bottom: 20px;">🏆 Top 10 Leaderboard</h4>
+						<div id="leaderboard-list" style="text-align: left;">
+							<p style="text-align: center; color: #999;">Laden...</p>
+						</div>
+					</div>
+
+					<button class="btn btn-primary" id="restart-game-btn">Speel Opnieuw</button>
+					<button class="btn btn-default" id="close-end-game-btn" style="margin-left: 10px;">Sluiten</button>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+
+	<!-- Leaderboard Section -->
+	<div id="fh5co-leaderboard" style="display: none;">
+		<!-- Hidden - leaderboard moved to game section above -->
+	</div>
+
 	<div id="fh5co-counter" class="fh5co-bg fh5co-counter" style="background-image:url(images/img_bg_5.jpg);">
 		<div class="overlay"></div>
 		<div class="container">
@@ -607,6 +788,12 @@
 	<script src="js/simplyCountdown.js"></script>
 	<!-- Main -->
 	<script src="js/main.js"></script>
+	<!-- Leaflet JS -->
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+	<!-- Supabase JS -->
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	<!-- GeoGuesser Game -->
+	<script src="js/geo-guesser.js"></script>
 
 	<script>
     var d = new Date(2026, 4, 9); // May 9, 2026 (month is 0-indexed)
