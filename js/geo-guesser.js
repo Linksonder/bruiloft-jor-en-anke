@@ -6,45 +6,30 @@ let roundResults = [];
 let hasGuessed = false;
 let guessMarker = null;
 let answerMarker = null;
+let questions = []; // Will be loaded from locations.json
 
 // Supabase Configuration
 const SUPABASE_URL = 'https://rkdlhwkihbdclxrpxmoa.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrZGxod2tpaGJkY2x4cnB4bW9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzI4MzMsImV4cCI6MjA4Mjk0ODgzM30.9TeWzRerZ2Mnqkcr1DSJjSJNfjC14xCr05ChYeNE3T8';
 var supabase;
 
-// Game questions - coordinates are [latitude, longitude]
-const questions = [
-    {
-        image: 'images/couple-1.jpg',
-        text: 'Waar wonen Jor & Anke nu?',
-        answer: { lat: 51.5714524081538, lng: 5.366804673662063 },
-        location: 'Waar ze nu wonen'
-    },
-    {
-        image: 'images/couple-2.jpg', 
-        text: 'Waar hebben ze elkaar ontmoet?',
-        answer: { lat: 51.585823, lng: 5.473122 },
-        location: 'Waar ze elkaar hebben ontmoet'
-    },
-    {
-        image: 'images/couple-3.jpg',
-        text: 'Waar zijn ze eerst gaan samenwonen?',
-        answer: { lat: 51.92972908736129, lng: 4.476185700584266 },
-        location: 'Waar ze eerst zijn gaan samenwonen'
-    },
-    {
-        image: 'images/gallery-1.jpg',
-        text: 'Waar heeft hij haar ten huwelijk gevraagd?',
-        answer: { lat: 51.924419, lng: 4.477732 },
-        location: 'Waar hij haar ten huwelijk heeft gevraagd'
-    },
-    {
-        image: 'images/gallery-2.jpg',
-        text: 'Waar gaan ze trouwen?',
-        answer: { lat: 51.56914439069676, lng: 5.233255710143935 },
-        location: 'Waar ze gaan trouwen'
+// Load locations from JSON file
+async function loadLocations() {
+    try {
+        const response = await fetch('locations.json');
+        const locations = await response.json();
+        questions = locations.map(loc => ({
+            image: loc.image,
+            text: loc.location,
+            answer: { lat: loc.coordinates[0], lng: loc.coordinates[1] },
+            location: loc.hint
+        }));
+        return true;
+    } catch (error) {
+        console.error('Error loading locations:', error);
+        return false;
     }
-];
+}
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -69,7 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function startGame() {
+async function startGame() {
+    // Load locations from JSON first
+    const loaded = await loadLocations();
+    if (!loaded || questions.length === 0) {
+        alert('Kon de locaties niet laden. Probeer het later opnieuw.');
+        return;
+    }
+    
     currentRound = 0;
     totalScore = 0;
     roundResults = [];
@@ -113,6 +105,7 @@ function loadRound() {
     
     // Update UI
     document.getElementById('current-round').textContent = currentRound + 1;
+    document.getElementById('total-rounds').textContent = questions.length;
     document.getElementById('question-text').textContent = question.text;
     document.getElementById('question-image').src = question.image;
     document.getElementById('feedback').innerHTML = '';
@@ -160,11 +153,11 @@ function makeGuess(lat, lng) {
         })
     }).addTo(map);
     
-    // Add answer marker (green)
+    // Add answer marker (olive green)
     answerMarker = L.marker([question.answer.lat, question.answer.lng], {
         icon: L.divIcon({
             className: 'answer-marker',
-            html: '<div style="background-color: #22c55e; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
+            html: '<div style="background-color: #617320; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
             iconSize: [20, 20],
             iconAnchor: [10, 10]
         })
@@ -173,7 +166,7 @@ function makeGuess(lat, lng) {
     // Draw line between guess and answer
     const line = L.polyline(
         [[lat, lng], [question.answer.lat, question.answer.lng]],
-        { color: 'red', weight: 2, dashArray: '5, 10' }
+        { color: '#8C0327', weight: 2, dashArray: '5, 10' }
     ).addTo(map);
     
     // Calculate distance in kilometers
@@ -195,15 +188,15 @@ function makeGuess(lat, lng) {
     const feedback = document.getElementById('feedback');
     
     if (distanceKm < 10) {
-        feedback.innerHTML = `🎯 <strong>Perfect!</strong> Je zat slechts ${distanceKm}km ernaast!<br><span style="color: #22c55e; font-size: 24px;">+${score} punten</span>`;
+        feedback.innerHTML = `🎯 <strong>Perfect!</strong> Je zat slechts ${distanceKm}km ernaast!<br><span style="color: #617320; font-size: 24px;">+${score} punten</span>`;
     } else if (distanceKm < 50) {
-        feedback.innerHTML = `👍 <strong>Uitstekend!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #22c55e; font-size: 24px;">+${score} punten</span>`;
+        feedback.innerHTML = `👍 <strong>Uitstekend!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #617320; font-size: 24px;">+${score} punten</span>`;
     } else if (distanceKm < 150) {
-        feedback.innerHTML = `👌 <strong>Goed gedaan!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #f59e0b; font-size: 24px;">+${score} punten</span>`;
+        feedback.innerHTML = `👌 <strong>Goed gedaan!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #F29F05; font-size: 24px;">+${score} punten</span>`;
     } else if (distanceKm < 300) {
-        feedback.innerHTML = `🤔 <strong>Niet slecht!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #f59e0b; font-size: 24px;">+${score} punten</span>`;
+        feedback.innerHTML = `🤔 <strong>Niet slecht!</strong> Je zat ${distanceKm}km ernaast!<br><span style="color: #F29F05; font-size: 24px;">+${score} punten</span>`;
     } else {
-        feedback.innerHTML = `📍 Het was <strong>${question.location}</strong>! Je zat ${distanceKm}km ernaast.<br><span style="color: #ef4444; font-size: 24px;">+${score} punten</span>`;
+        feedback.innerHTML = `📍 Het was <strong>${question.location}</strong>! Je zat ${distanceKm}km ernaast.<br><span style="color: #8C0327; font-size: 24px;">+${score} punten</span>`;
     }
     
     roundResults.push({
@@ -233,16 +226,16 @@ function endGame() {
     const message = document.getElementById('score-message');
     if (totalScore >= 270) {
         message.innerHTML = '🏆 <strong>Ongelooflijk!</strong> Ben jij een GPS?!';
-        message.style.color = '#22c55e';
+        message.style.color = '#617320';
     } else if (totalScore >= 200) {
         message.innerHTML = '⭐ <strong>Super gedaan!</strong> Je hebt talent!';
-        message.style.color = '#22c55e';
+        message.style.color = '#617320';
     } else if (totalScore >= 120) {
         message.innerHTML = '👏 <strong>Goed bezig!</strong> Niet slecht!';
-        message.style.color = '#f59e0b';
+        message.style.color = '#F29F05';
     } else {
         message.innerHTML = '😄 <strong>Gezellig gespeeld!</strong> Probeer nog eens!';
-        message.style.color = '#f59e0b';
+        message.style.color = '#F29F05';
     }
     
     // Round details
@@ -250,7 +243,7 @@ function endGame() {
     detailsDiv.innerHTML = '<h4 style="margin-bottom: 15px;">Je resultaten:</h4>';
     roundResults.forEach(result => {
         detailsDiv.innerHTML += `
-            <div style="padding: 12px; background: #f8f8f8; margin: 8px 0; border-radius: 5px; border-left: 4px solid #F14E95;">
+            <div style="padding: 12px; background: #f8f8f8; margin: 8px 0; border-radius: 5px; border-left: 4px solid #8C0327;">
                 <strong>Ronde ${result.round}:</strong> ${result.location}<br>
                 <span style="color: #666;">📍 ${result.distance} km afstand | ⭐ ${result.score} punten</span>
             </div>
@@ -266,7 +259,7 @@ async function saveScore() {
     const feedback = document.getElementById('save-feedback');
     
     if (!playerName) {
-        feedback.innerHTML = '<span style="color: #ef4444;">❌ Vul je naam in!</span>';
+        feedback.innerHTML = '<span style="color: #8C0327;">❌ Vul je naam in!</span>';
         return;
     }
     
@@ -279,7 +272,7 @@ async function saveScore() {
         
         if (error) throw error;
         
-        feedback.innerHTML = '<span style="color: #22c55e;">✅ Opgeslagen!</span>';
+        feedback.innerHTML = '<span style="color: #617320;">✅ Opgeslagen!</span>';
         document.getElementById('save-score-btn').disabled = true;
         document.getElementById('player-name').disabled = true;
         
@@ -291,7 +284,7 @@ async function saveScore() {
         
     } catch (error) {
         console.error('Error saving score:', error);
-        feedback.innerHTML = '<span style="color: #ef4444;">❌ Er ging iets mis. Probeer opnieuw.</span>';
+        feedback.innerHTML = '<span style="color: #8C0327;">❌ Er ging iets mis. Probeer opnieuw.</span>';
     }
 }
 
@@ -312,12 +305,12 @@ async function loadLeaderboard() {
             data.forEach((entry, index) => {
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
                 const isCurrentUser = entry.score === totalScore && entry.name === document.getElementById('player-name').value.trim();
-                const highlight = isCurrentUser ? 'background: #fff3cd; border-left: 4px solid #F14E95;' : 'background: #f8f8f8;';
+                const highlight = isCurrentUser ? 'background: #fff3cd; border-left: 4px solid #8C0327;' : 'background: #f8f8f8;';
                 
                 leaderboardDiv.innerHTML += `
                     <div style="padding: 12px; ${highlight} margin: 8px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
                         <span><strong>${medal}</strong> ${entry.name}</span>
-                        <span style="color: #F14E95; font-weight: bold;">${entry.score} punten</span>
+                        <span style="color: #8C0327; font-weight: bold;">${entry.score} punten</span>
                     </div>
                 `;
             });
@@ -327,7 +320,7 @@ async function loadLeaderboard() {
         
     } catch (error) {
         console.error('Error loading leaderboard:', error);
-        leaderboardDiv.innerHTML = '<p style="text-align: center; color: #ef4444;">Kon leaderboard niet laden.</p>';
+        leaderboardDiv.innerHTML = '<p style="text-align: center; color: #8C0327;">Kon leaderboard niet laden.</p>';
     }
 }
 
@@ -349,9 +342,9 @@ async function loadMainLeaderboard() {
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<strong>${index + 1}.</strong>`;
                 
                 leaderboardDiv.innerHTML += `
-                    <div style="padding: 15px; background: ${index < 3 ? '#fff9e6' : '#f8f8f8'}; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${index < 3 ? '#F14E95' : '#ddd'};">
+                    <div style="padding: 15px; background: ${index < 3 ? '#fff9e6' : '#f8f8f8'}; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid ${index < 3 ? '#8C0327' : '#ddd'};">
                         <span style="font-size: 18px;">${medal} <strong>${entry.name}</strong></span>
-                        <span style="color: #F14E95; font-weight: bold; font-size: 20px;">${entry.score} punten</span>
+                        <span style="color: #8C0327; font-weight: bold; font-size: 20px;">${entry.score} punten</span>
                     </div>
                 `;
             });
@@ -361,7 +354,7 @@ async function loadMainLeaderboard() {
         
     } catch (error) {
         console.error('Error loading main leaderboard:', error);
-        leaderboardDiv.innerHTML = '<p style="text-align: center; color: #ef4444;">Kon leaderboard niet laden.</p>';
+        leaderboardDiv.innerHTML = '<p style="text-align: center; color: #8C0327;">Kon leaderboard niet laden.</p>';
     }
 }
 

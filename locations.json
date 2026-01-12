@@ -1,23 +1,38 @@
 [
     {
-        "location": "Waar ze nu wonen",
-        "coordinates": [51.5714524081538, 5.366804673662063]
+        "location": "Waar wonen Jor & Anke nu?",
+        "hint": "Nieuwe Erven 38, Liempde",
+        "coordinates": [51.57155726580445, 5.366792868426877],
+        "image": "images/jor_en_anke/picture_i.jpg"
     },
     {
-        "location": "Waar ze elkaar hebben ontmoet",
-        "coordinates": [51.585823, 5.473122]
+        "location": "Waar hebben ze elkaar ontmoet?",
+        "hint": "Faculteit Civiele Techniek, Stevinweg 1 Delft",
+        "coordinates": [51.99909618140966, 4.375463453109897],
+        "image": "images/jor_en_anke/picture_j.jpg"
     },
     {
-        "location": "Waar ze eerst zijn gaan samenwonen",
-        "coordinates": [51.92972908736129, 4.476185700584266]
+        "location": "Waar zijn ze eerst gaan samenwonen?",
+        "hint": "Stadhoudersweg 46D Rotterdam",
+        "coordinates": [51.931379039666076, 4.464145495998269],
+        "image": "images/jor_en_anke/picture_k.JPG"
     },
     {
-        "location": "Waar hij haar ten huwelijk heeft gevraagd",
-        "coordinates": [51.924419, 4.477732]
+        "location": "Waar heeft hij haar ten huwelijk gevraagd?",
+        "hint": "Cantavieja, Spanje",
+        "coordinates": [40.52543933194729, -0.4044856865841257],
+        "image": "images/jor_en_anke/picture_m.jpg"
     },
     {
-        "location": "Waar ze gaan trouwen",
-        "coordinates": [51.56914439069676, 5.233255710143935]
+        "location": "Waar gaan ze trouwen?",
+        "hint": "Het Boscafé, Oisterwijk",
+        "coordinates": [51.56914439069676, 5.233255710143935],
+        "image": "images/jor_en_anke/picture_l.jpg"
+    },
+    {
+        "location": "Waar gaan ze op huwelijksreis?",
+        "hint": "Vancouver, Canada",
+        "coordinates": [49.283915645820095, -123.11429369550494],
+        "image": "images/jor_en_anke/picture_h.jpg"
     }
-
 ]
