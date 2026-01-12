@@ -430,6 +430,7 @@ h1, h2, h3, h4, h5, h6, figure {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
 @media screen and (max-width: 768px) {
   #fh5co-counter,
@@ -1400,6 +1401,7 @@ form label {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
 
 #fh5co-started .fh5co-heading h2 {

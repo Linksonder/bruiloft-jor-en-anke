@@ -172,6 +172,76 @@
 			overflow-y: auto;
 			height: 100%;
 		}
+		
+		/* Mobile responsive styles */
+		@media (max-width: 768px) {
+			.game-modal-content {
+				width: 100%;
+				height: 100%;
+				max-height: 100%;
+				border-radius: 0;
+			}
+			.game-header {
+				padding: 12px 15px;
+			}
+			.game-header h3 {
+				font-size: 16px;
+			}
+			.game-header h3 i {
+				display: none;
+			}
+			.game-body {
+				padding: 10px;
+			}
+			#game-play-modal .row {
+				flex-direction: column;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+			#game-play-modal .col-md-4 {
+				flex: 0 0 auto;
+				max-width: 100%;
+				width: 100%;
+				height: auto;
+				padding: 10px;
+				order: 1;
+			}
+			#game-play-modal .col-md-8 {
+				flex: 1;
+				width: 100%;
+				min-height: 250px;
+				order: 2;
+			}
+			#game-play-modal #map {
+				height: 100%;
+				min-height: 250px;
+			}
+			#question-image {
+				max-height: 120px;
+				object-fit: cover;
+			}
+			#feedback {
+				min-height: 40px !important;
+				font-size: 14px;
+			}
+			#game-end-modal {
+				padding: 15px;
+			}
+			#game-end-modal h3 {
+				font-size: 20px;
+			}
+			#game-end-modal .btn {
+				display: block;
+				width: 100%;
+				margin: 10px 0 !important;
+			}
+			#final-score {
+				font-size: 40px !important;
+			}
+			#round-details {
+				font-size: 14px;
+			}
+		}
 	</style>
 
 	<!-- Modernizr JS -->
@@ -382,8 +452,8 @@
 		</div>
 	</div>
 
-	<div id="fh5co-geogame" class="fh5co-bg" style="background-image:url(images/jor_en_anke/picture_e.jpg); padding-top: 80px; padding-bottom: 100px; margin-bottom: 80px; position: relative; z-index: 2;">
-		<div class="overlay"></div>
+	<div id="fh5co-geogame" class="fh5co-bg" style="background-image:url(images/jor_en_anke/picture_e.jpg); padding-top: 80px; padding-bottom: 100px; overflow: hidden;">
+		<div class="overlay" style="pointer-events: none;"></div>
 		<div class="container">
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center fh5co-heading animate-box">
@@ -407,16 +477,17 @@
 			</div>
 		</div>
 	</div>
+	<div style="clear: both;"></div>
 
-	<div id="fh5co-rsvp" style="padding-top: 80px; position: relative; z-index: 1;">
+	<div id="fh5co-rsvp" style="padding-top: 80px; clear: both;">
 		<div class="container">
-			<div class="row animate-box">
+			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center fh5co-heading">
 					<h2 style="color: #617320;">RSVP</h2>
 					<p>Laat ons weten of je erbij bent!</p>
 				</div>
 			</div>
-			<div class="row animate-box">
+			<div class="row">
 				<div class="col-md-8 col-md-offset-2">
 					<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScX1HYjqxLhALUP2ccC6a7-XUWcq0Yg72NhPGWUETxG_Z16iA/viewform?embedded=true" width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0" style="border: none;">Laden…</iframe>
 				</div>

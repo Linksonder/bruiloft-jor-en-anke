@@ -97,7 +97,10 @@ async function startGame() {
             map = L.map('map', {
                 center: [52.1326, 5.2913], // Netherlands center
                 zoom: 7,
-                zoomControl: true
+                zoomControl: true,
+                tap: true, // Enable tap for mobile
+                touchZoom: true,
+                dragging: true
             });
             
             // Add OpenStreetMap tiles
@@ -105,9 +108,23 @@ async function startGame() {
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
+            
+            // Handle window resize for mobile orientation changes
+            window.addEventListener('resize', function() {
+                if (map) {
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                }
+            });
         } else {
             map.invalidateSize(); // Refresh map size
         }
+        
+        // Extra invalidateSize for mobile
+        setTimeout(function() {
+            if (map) map.invalidateSize();
+        }, 300);
         
         loadRound();
     }, 100);
