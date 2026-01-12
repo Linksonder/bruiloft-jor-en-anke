@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load main leaderboard on page load
     loadMainLeaderboard();
     
+    // Preload game images in the background
+    preloadGameImages();
+    
     document.getElementById('start-game-btn').addEventListener('click', startGame);
     document.getElementById('next-button').addEventListener('click', nextRound);
     document.getElementById('restart-game-btn').addEventListener('click', resetGame);
@@ -53,6 +56,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Preload all game images for faster loading
+async function preloadGameImages() {
+    try {
+        const response = await fetch('locations.json');
+        const locations = await response.json();
+        locations.forEach(loc => {
+            if (loc.image) {
+                const img = new Image();
+                img.src = loc.image;
+            }
+        });
+    } catch (error) {
+        console.log('Preloading images failed:', error);
+    }
+}
 
 async function startGame() {
     // Load locations from JSON first
